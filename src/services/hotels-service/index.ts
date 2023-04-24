@@ -13,7 +13,7 @@ async function getHotels(userId: number): Promise<Hotel[]> {
   if (ticket.status !== TicketStatus.PAID || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel) throw paymentRequiredError();
 
   const hotels = await hotelsRepository.findHotels();
-  if (!hotels) throw notFoundError();
+  if (!hotels || hotels.length === 0) throw notFoundError();
 
   return hotels;
 }
