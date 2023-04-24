@@ -20,10 +20,10 @@ export async function getHotels(req: AuthenticatedRequest, res: Response, next: 
 
 export async function getHotelWithRoom(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<Response> {
   const { userId } = req as { userId: number };
-  const hotelId = Number(req.params);
+  const { hotelId } = req.params as { hotelId: string } ;
 
   try {
-    const hotelWithRoom = await hotelsServices.getHotelWithRoom(userId, hotelId);
+    const hotelWithRoom = await hotelsServices.getHotelWithRoom(userId, parseInt(hotelId));
     return res.status(httpStatus.OK).send(hotelWithRoom);
   } catch(error) {
     if(error.name === 'PaymentRequiredError') {

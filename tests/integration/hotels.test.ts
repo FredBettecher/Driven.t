@@ -160,18 +160,6 @@ describe('GET /hotels/:id', () => {
       expect(response.status).toBe(httpStatus.NOT_FOUND);
     });
 
-    it('should respond with status 404 if hotel does not exist', async () => {
-      const user = await createUser();
-      const token = await generateValidToken(user);
-      const enrollment = await createEnrollmentWithAddress(user);
-      const ticketType = await createTicketTypeWithNoHotel();
-      await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
-      
-      const response = await server.get('/hotels/1').set('Authorization', `Bearer ${token}`);
-
-      expect(response.status).toBe(httpStatus.NOT_FOUND);
-    });
-
     it('should respond with status 402 if ticket was not paid', async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
@@ -208,6 +196,18 @@ describe('GET /hotels/:id', () => {
       expect(response.status).toBe(httpStatus.PAYMENT_REQUIRED);
     });
 
+    it('should respond with status 404 if hotel does not exist', async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createTicketTypeWithHotel();
+      await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+      
+      const response = await server.get('/hotels/1').set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(httpStatus.NOT_FOUND);
+    });
+
     it('should return with status 200 and the list of rooms', async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
@@ -218,6 +218,7 @@ describe('GET /hotels/:id', () => {
       const room = await createRoom(hotel.id);
       
       const response = await server.get(`/hotels/${hotel.id}`).set('Authorization', `Bearer ${token}`);
+      console.log(response.body);
 
       expect(response.status).toBe(httpStatus.OK);
       expect(response.body).toEqual([
