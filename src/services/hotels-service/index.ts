@@ -6,14 +6,14 @@ import ticketsRepository from '@/repositories/tickets-repository';
 
 async function getHotels(userId: number): Promise<Hotel[]> {
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
-  if (!enrollment) throw notFoundError;
+  if (!enrollment) throw notFoundError();
 
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
-  if (ticket) throw notFoundError;
-  if (ticket.status !== TicketStatus.PAID || ticket.TicketType.isRemote === true) throw paymentRequiredError;
+  if (!ticket) throw notFoundError();
+  if (ticket.status !== TicketStatus.PAID || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel) throw paymentRequiredError();
 
   const hotels = await hotelsRepository.findHotels();
-  if (!hotels) throw notFoundError;
+  if (!hotels) throw notFoundError();
 
   return hotels;
 }
