@@ -44,13 +44,13 @@ async function createBooking(userId: number, roomId: number): Promise<Booking> {
     return createBooking;
 }
 
-async function updateBooking(userId: number, roomId: number): Promise<Booking> {
+async function updateBooking(userId: number, bookingId:number, roomId: number): Promise<Booking> {
     await checkBusinessRule(userId, roomId);
 
     const booking = await bookigRepository.findBooking(userId);
     if(!booking) throw forbiddenError();
 
-    const updateBooking = await bookigRepository.updateBooking(booking.id, roomId);
+    const updateBooking = await bookigRepository.updateBooking(bookingId, roomId);
 
     return updateBooking;
 }

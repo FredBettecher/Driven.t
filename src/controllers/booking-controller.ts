@@ -28,10 +28,11 @@ export async function postBooking(req: AuthenticatedRequest, res: Response, next
 
 export async function updateBooking(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<Response> {
     const { userId } = req as { userId: number };
+    const { bookingId } = req.params as { bookingId: string };
     const { roomId } = req.body as { roomId: number };
 
     try {
-        const updateBooking = await bookingService.updateBooking(userId, roomId);
+        const updateBooking = await bookingService.updateBooking(userId, parseInt(bookingId), roomId);
         return res.status(httpStatus.OK).send({ bookingId: updateBooking.id });
     } catch(error) {
         next(error);
