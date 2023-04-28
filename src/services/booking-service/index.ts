@@ -19,7 +19,7 @@ async function listBooking(userId: number) {
     return response;
 }
 
-async function createBooking(userId: number, roomId: number): Promise<Booking> {
+async function createBooking(userId: number, roomId: number): Promise<Booking>{
     const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
     if(!enrollment) throw notFoundError();
 
