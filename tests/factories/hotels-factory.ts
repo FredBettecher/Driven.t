@@ -1,5 +1,5 @@
 import faker from '@faker-js/faker';
-import { Hotel, Room } from '@prisma/client';
+import { Booking, Hotel, Room } from '@prisma/client';
 import { prisma } from '@/config';
 
 export async function createHotel(): Promise<Hotel> {
@@ -11,12 +11,15 @@ export async function createHotel(): Promise<Hotel> {
   });
 }
 
-export async function createRoom(hotelId: number): Promise<Room> {
+export async function createRoom(hotelId: number): Promise<Room & { Booking: Booking[] }> {
   return prisma.room.create({
     data: {
       name: faker.lorem.word(),
-      capacity: faker.datatype.number(10),
+      capacity: 1,
       hotelId: hotelId,
-    }
+    },
+    include: {
+      Booking: true,
+    },
   });
 }
