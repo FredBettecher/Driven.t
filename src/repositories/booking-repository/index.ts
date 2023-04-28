@@ -12,8 +12,27 @@ async function findBooking(userId: number): Promise<Booking & { Room: Room }> {
     });
 }
 
+async function findRoomsWithBookings(roomId: number): Promise<Booking[]> {
+    return prisma.booking.findMany({
+        where: {
+            roomId,
+        }
+    })
+}
+
+async function createBooking(userId: number, roomId: number): Promise<Booking> {
+    return prisma.booking.create({
+        data: {
+            userId,
+            roomId,
+        },
+    });
+}
+
 const bookigRepository = {
     findBooking,
+    findRoomsWithBookings,
+    createBooking,
 };
 
 export default bookigRepository;

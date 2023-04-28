@@ -2,7 +2,7 @@ import app, { init } from "@/app";
 import { cleanDb, generateValidToken } from "../helpers";
 import supertest from "supertest";
 import httpStatus from "http-status";
-import { createBooking, createEnrollmentWithAddress, createTicket, createTicketType, createTicketTypeWithHotel, createUser } from "../factories";
+import { createBooking, createEnrollmentWithAddress, createTicket, createTicketType, createTicketTypeRemote, createTicketTypeWithHotel, createTicketTypeWithHotelNotIncluded, createUser } from "../factories";
 import { TicketStatus } from "@prisma/client";
 import { createHotel, createRoom } from "../factories/hotels-factory";
 
@@ -25,7 +25,7 @@ describe('GET /booking', () => {
         });
     });
 
-    describe('when token is valid', async () => {
+    describe('when token is valid', () => {
         it('should return with status 404 if user has no booking', async () => {
             const user = await createUser();
             const token = await generateValidToken(user);
@@ -59,6 +59,30 @@ describe('GET /booking', () => {
             expect(response.body).toEqual({
                 ...result,
             });
+        });
+    });
+});
+
+describe('POST /booking', () => {
+    describe('when token is invalid', () => {
+        it('should return with status 401', async () => {
+            const response = await server.post('/booking').send({});
+
+            expect(response.status).toBe(httpStatus.UNAUTHORIZED);
+        });
+    });
+
+    describe('when token is valid', () => {
+        it('should return with status 403 if ticket type is remote', async () => {
+            const user = await createUser();
+            const token = await generateValidToken(user);
+            const enrollment = await createEnrollmentWithAddress(user);
+            const ticketType = await createTicketTypeRemote();
+            await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+
+            const response = await server.post('/booking').set('Authorization', `Bearer ${token}`).send({ roomId: 1 });
+
+            expect(response.status).toBe(httpStatus.FORBIDDEN);
         });
     });
 });
